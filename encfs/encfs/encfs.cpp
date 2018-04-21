@@ -82,7 +82,7 @@ static int withCipherPath( const char *opName, const char *path,
     EncFS_Context *ctx = context();
 
     int res = -EIO;
-    shared_ptr<DirNode> FSRoot = ctx->getRoot(&res);
+    boost::shared_ptr<DirNode> FSRoot = ctx->getRoot(&res);
     if(!FSRoot)
 	return res;
 
@@ -117,13 +117,13 @@ static int withFileNode( const char *opName,
     EncFS_Context *ctx = context();
 
     int res = -EIO;
-    shared_ptr<DirNode> FSRoot = ctx->getRoot(&res);
+    boost::shared_ptr<DirNode> FSRoot = ctx->getRoot(&res);
     if(!FSRoot)
 	return res;
 
     try
     {
-	shared_ptr<FileNode> fnode;
+	boost::shared_ptr<FileNode> fnode;
 
 	if(fi != NULL)
 	    fnode = GET_FN(ctx, fi);
@@ -162,7 +162,7 @@ int _do_getattr(FileNode *fnode, struct stat *stbuf)
     if(res == ESUCCESS && S_ISLNK(stbuf->st_mode))
     {
 	EncFS_Context *ctx = context();
-	shared_ptr<DirNode> FSRoot = ctx->getRoot(&res);
+	boost::shared_ptr<DirNode> FSRoot = ctx->getRoot(&res);
 	if(FSRoot)
 	{
 	    // determine plaintext link size..  Easiest to read and decrypt..
@@ -203,7 +203,7 @@ int encfs_getdir(const char *path, fuse_dirh_t h, fuse_dirfil_t filler)
     EncFS_Context *ctx = context();
 
     int res = ESUCCESS;
-    shared_ptr<DirNode> FSRoot = ctx->getRoot(&res);
+    boost::shared_ptr<DirNode> FSRoot = ctx->getRoot(&res);
     if(!FSRoot)
 	return res;
 
@@ -248,13 +248,13 @@ int encfs_mknod(const char *path, mode_t mode, dev_t rdev)
     EncFS_Context *ctx = context();
 
     int res = -EIO;
-    shared_ptr<DirNode> FSRoot = ctx->getRoot(&res);
+    boost::shared_ptr<DirNode> FSRoot = ctx->getRoot(&res);
     if(!FSRoot)
 	return res;
 
     try
     {
-	shared_ptr<FileNode> fnode = FSRoot->lookupNode( path, "mknod" );
+	boost::shared_ptr<FileNode> fnode = FSRoot->lookupNode( path, "mknod" );
 
 	rLog(Info, "mknod on %s, mode %i, dev %" PRIi64,
 		fnode->cipherName(), mode, (int64_t)rdev);
@@ -274,7 +274,7 @@ int encfs_mknod(const char *path, mode_t mode, dev_t rdev)
 	    // try again using the parent dir's group
 	    string parent = fnode->plaintextParent();
 	    rInfo("trying public filesystem workaround for %s", parent.c_str());
-	    shared_ptr<FileNode> dnode = 
+	    boost::shared_ptr<FileNode> dnode = 
 		FSRoot->lookupNode( parent.c_str(), "mknod" );
 
 	    struct stat st;
@@ -295,7 +295,7 @@ int encfs_mkdir(const char *path, mode_t mode)
     EncFS_Context *ctx = context();
 
     int res = -EIO;
-    shared_ptr<DirNode> FSRoot = ctx->getRoot(&res);
+    boost::shared_ptr<DirNode> FSRoot = ctx->getRoot(&res);
     if(!FSRoot)
 	return res;
 
@@ -314,7 +314,7 @@ int encfs_mkdir(const char *path, mode_t mode)
 	{
 	    // try again using the parent dir's group
 	    string parent = parentDirectory( path );
-	    shared_ptr<FileNode> dnode = 
+	    boost::shared_ptr<FileNode> dnode = 
 		FSRoot->lookupNode( parent.c_str(), "mkdir" );
 
 	    struct stat st;
@@ -334,7 +334,7 @@ int encfs_unlink(const char *path)
     EncFS_Context *ctx = context();
 
     int res = -EIO;
-    shared_ptr<DirNode> FSRoot = ctx->getRoot(&res);
+    boost::shared_ptr<DirNode> FSRoot = ctx->getRoot(&res);
     if(!FSRoot)
 	return res;
 
@@ -371,7 +371,7 @@ int _do_readlink(EncFS_Context *ctx, const string &cyName,
 	return -EINVAL;
 #if 0
     int res = ESUCCESS;
-    shared_ptr<DirNode> FSRoot = ctx->getRoot(&res);
+    boost::shared_ptr<DirNode> FSRoot = ctx->getRoot(&res);
     if(!FSRoot)
 	return res;
 
@@ -414,7 +414,7 @@ int encfs_symlink(const char *from, const char *to)
 	return -EIO;
 #if 0
     int res = -EIO;
-    shared_ptr<DirNode> FSRoot = ctx->getRoot(&res);
+    boost::shared_ptr<DirNode> FSRoot = ctx->getRoot(&res);
     if(!FSRoot)
 	return res;
 
@@ -460,7 +460,7 @@ int encfs_link(const char *from, const char *to)
     EncFS_Context *ctx = context();
 
     int res = -EIO;
-    shared_ptr<DirNode> FSRoot = ctx->getRoot(&res);
+    boost::shared_ptr<DirNode> FSRoot = ctx->getRoot(&res);
     if(!FSRoot)
 	return res;
 
@@ -480,7 +480,7 @@ int encfs_rename(const char *from, const char *to)
     EncFS_Context *ctx = context();
 
     int res = -EIO;
-    shared_ptr<DirNode> FSRoot = ctx->getRoot(&res);
+    boost::shared_ptr<DirNode> FSRoot = ctx->getRoot(&res);
     if(!FSRoot)
 	return res;
 
@@ -569,13 +569,13 @@ int encfs_open(const char *path, struct fuse_file_info *file)
     EncFS_Context *ctx = context();
 
     int res = -EIO;
-    shared_ptr<DirNode> FSRoot = ctx->getRoot(&res);
+    boost::shared_ptr<DirNode> FSRoot = ctx->getRoot(&res);
     if(!FSRoot)
 	return res;
 
     try
     {
-	shared_ptr<FileNode> fnode = 
+	boost::shared_ptr<FileNode> fnode = 
 	    FSRoot->openNode( path, "open", file->flags, &res );
 
 	if(fnode)
@@ -818,7 +818,7 @@ static uint32_t encfs_win_get_attributes(const char *fn)
     EncFS_Context *ctx = context();
 
     int res = -EIO;
-    shared_ptr<DirNode> FSRoot = ctx->getRoot(&res);
+    boost::shared_ptr<DirNode> FSRoot = ctx->getRoot(&res);
     if(!FSRoot)
 	return res;
 
@@ -832,7 +832,7 @@ static int encfs_win_set_attributes(const char *fn, uint32_t attr)
     EncFS_Context *ctx = context();
 
     int res = -EIO;
-    shared_ptr<DirNode> FSRoot = ctx->getRoot(&res);
+    boost::shared_ptr<DirNode> FSRoot = ctx->getRoot(&res);
     if(!FSRoot)
 	return res;
 
@@ -864,7 +864,7 @@ static int encfs_win_set_times(const char *path, struct fuse_file_info *fi, cons
     if (!fi || !fi->fh)
     {
 	int res = -EIO;
-	shared_ptr<DirNode> FSRoot = context()->getRoot(&res);
+	boost::shared_ptr<DirNode> FSRoot = context()->getRoot(&res);
 	if(!FSRoot)
 	    return res;
 
